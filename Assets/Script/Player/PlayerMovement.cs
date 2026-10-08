@@ -1,36 +1,44 @@
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements.Experimental;
 
 public class PlayerMovement : MonoBehaviour
 {
     public Rigidbody2D rb;
-    [SerializeField] float JumpPower = 16;
+    public PlayerInput playerInput;
+    public Vector2 moveInput;
+    public int facingDirection = 1;
     [SerializeField] float Speed = 8f;
-    private int direzione;
+    [SerializeField] float JumpPower = 16;
 
-    // Update is called once per frame
     void Update()
     {
-        if (Keyboard.current.rightArrowKey.isPressed)
-        {
-            direzione = 1;
-        } else if (Keyboard.current.leftArrowKey.isPressed)
-        {
-            direzione = -1;
-        } else
-        {
-            direzione = 0;
-        }
-
-        if (direzione != 0)
-        {
-            transform.localScale = new Vector3(direzione, 1, 1);
-        }
+        Flip();
     }
-
+    
     private void FixedUpdate()
     {
-        rb.linearVelocity = new UnityEngine.Vector2(direzione * Speed, rb.linearVelocity.y);
+        float targetSpeed = moveInput.x * Speed;
+        rb.linearVelocity = new Vector2(targetSpeed, rb.linearVelocity.y);
+    }
+
+    public void OnMove(InputValue value)
+    {
+        moveInput = value.Get<Vector2>();
+    }
+
+    void Flip()
+    {
+        if(moveInput.x > 0.1f)
+        {
+            facingDirection = 1;
+        }
+        else if(moveInput.x < -0.1f)
+        {
+            facingDirection = -1;
+        }
+
+        transform.localScale = new Vector3(facingDirection, 1, 1);
     }
 }
